@@ -1,0 +1,41 @@
+{
+  "user": "nobody",
+  "group": "nogroup",
+
+  "listen": [
+    {
+      "port": 80
+    },
+    {
+      "port": 443,
+      "certificate": "./certificate.pem",
+      "key": "./key.pem"
+    }
+  ],
+
+  "rules": [
+    // Redirects all HTTP requests to HTTPS.
+    {
+      "secure": false,
+
+      "action": ["redirect", {
+        "code": 301,
+        "url": {
+          "protocol": "https"
+        }
+      }]
+    },
+
+    // Serve static files.
+    {
+      "path": "/static/",
+
+      "action": ["static", "./public/"]
+    },
+
+    // Proxy all requests to http://example.org/
+    {
+      "action": ["proxy", "http://example.org/"]
+    }
+  ]
+}
