@@ -116,13 +116,13 @@ execPromise(async args => {
   // Starts listening.
   const server = createHttpServer()
   await Promise.all(map(ensureArray(config.listen), async conf => {
-    const { certificate, key } = conf
-    if (certificate && key) {
+    const { cert, key } = conf
+    if (cert && key) {
       [
-        conf.certificate,
+        conf.cert,
         conf.key
       ] = await Promise.all([
-        readFile(certificate),
+        readFile(cert),
         readFile(key)
       ])
     }
