@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
-import assign from 'lodash/assign'
-import compression from 'compression'
+import compress from 'koa-compress'
 import createCallback from 'lodash/iteratee'
 import eventToPromise from 'event-to-promise'
 import execPromise from 'exec-promise'
-import connect from 'connect'
-import forEach from 'lodash/forEach'
-import helmet from 'helmet'
+import find from 'lodash/find'
+import helmet from 'koa-helmet'
 import isArray from 'lodash/isArray'
 import isString from 'lodash/isString'
+import Koa from 'koa'
+import koaConvert from 'koa-convert'
 import map from 'lodash/map'
 import minimist from 'minimist'
-import responseTime from 'response-time'
-import serveStatic from 'serve-static'
+import responseTime from 'koa-response-time'
+import serveStatic from 'koa-serve-static'
 import { create as createHttpServer } from 'http-server-plus'
 import { createServer as createProxyServer } from 'http-proxy'
 import { format as formatUrl } from 'url'
@@ -42,32 +42,39 @@ const ACTIONS = Object.freeze({
       target: conf
     })
 
-    return (req, res) => {
-      proxy.web(req, res, error => {
-        console.error('proxy error', error)
-      })
-    }
+    return ctx => new Promise((resolve, reject) => {
+      ctx.respond = false
+      proxy.web(ctx.req, ctx.res, error => error
+        ? reject(error)
+        : resolve()
+      )
+    })
   },
 
-  redirect ({ code = 302, url }) {
+  redirect ({ code, url }) {
     return isString(url)
-      ? (req, res) => {
-        res.redirect(code, url)
+      ? async ctx => {
+        code && (ctx.status = code)
+        ctx.redirect(code, url)
       }
-      : (req, res) => {
+      : async ctx => {
         const {
-          protocol,
           hostname,
+          path: pathname,
           port,
-          path
-        } = req
+          protocol,
+          search
+        } = ctx
 
-        res.redirect(code, formatUrl(assign({
-          protocol,
+        code && (ctx.status = code)
+        ctx.redirect(formatUrl({
           hostname,
+          pathname,
           port,
-          path
-        }, url)))
+          protocol,
+          search,
+          ...url
+        }))
       }
   },
 
@@ -151,8 +158,14 @@ execPromise(async args => {
     }
   }
 
-  const app = connect()
-  server.on('request', app)
+  const app = new Koa()
+  server.on('request', app.callback())
+
+  // Patch koa to accept both legacy and modern middlewares.
+  // See: https://github.com/koajs/convert#migration
+  app.use = (use =>
+    middleware => use.call(app, koaConvert(middleware))
+  )(app.use)
 
   app.use(responseTime())
 
@@ -160,19 +173,16 @@ execPromise(async args => {
   // https://www.npmjs.com/package/helmet
   app.use(helmet())
 
-  app.use(compression())
+  app.use(compress())
 
   {
     const rules = map(ensureArray(config.rules), normalizeRule)
 
-    app.use((req, res) => {
-      forEach(rules, rule => {
-        if (rule.match(req)) {
-          rule.action(req, res)
-
-          return false
-        }
-      })
+    app.use((ctx, next) => {
+      const rule = find(rules, r => r.match(ctx))
+      return rule
+        ? rule.action(ctx)
+        : next()
     })
   }
 
