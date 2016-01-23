@@ -45,13 +45,22 @@ const ACTIONS = Object.freeze({
       target: conf
     })
 
-    return ctx => new Promise((resolve, reject) => {
+    const action = ctx => new Promise((resolve, reject) => {
       ctx.respond = false
       proxy.web(ctx.req, ctx.res, error => error
         ? reject(error)
         : resolve()
       )
     })
+    action.ws = ctx => new Promise((resolve, reject) => {
+      ctx.respond = false
+      proxy.ws(ctx.req, ctx.socket, ctx.head, error => error
+        ? reject(error)
+        : resolve()
+      )
+    })
+
+    return action
   },
 
   redirect ({ code, url }) {
@@ -192,6 +201,15 @@ execPromise(async args => {
       return rule
         ? rule.action(ctx)
         : next()
+    })
+
+    server.on('upgrade', (req, socket, head) => {
+      const ctx = Object.defineProperties(app.createContext(req), {
+        head: { value: head },
+        socket: { value: socket }
+      })
+      const rule = find(rules, r => r.action.ws && r.match(ctx))
+      return rule && rule.action.ws(ctx)
     })
   }
 
