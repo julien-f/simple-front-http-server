@@ -12,6 +12,7 @@ import Koa from 'koa'
 import koaConvert from 'koa-convert'
 import map from 'lodash/map'
 import minimist from 'minimist'
+import morgan from 'koa-morgan'
 import responseTime from 'koa-response-time'
 import serveStatic from 'koa-serve-static'
 import { create as createHttpServer } from 'http-server-plus'
@@ -166,6 +167,8 @@ execPromise(async args => {
   app.use = (use =>
     middleware => use.call(app, koaConvert(middleware))
   )(app.use)
+
+  config.logFormat && app.use(morgan(config.logFormat))
 
   app.use(responseTime())
 

@@ -24,6 +24,9 @@
     }
   ],
 
+  // https://github.com/expressjs/morgan#predefined-formats
+  "logFormat": "dev",
+
   "rules": [
     // Redirects all HTTP requests to HTTPS.
     {
