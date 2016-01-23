@@ -43,7 +43,9 @@ const ACTIONS = Object.freeze({
     })
 
     return (req, res) => {
-      proxy.web(req, res)
+      proxy.web(req, res, error => {
+        console.error('proxy error', error)
+      })
     }
   },
 
