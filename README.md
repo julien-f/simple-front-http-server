@@ -1,13 +1,13 @@
-# ${pkg.name} [![Build Status](https://travis-ci.org/${pkg.shortGitHubPath}.png?branch=master)](https://travis-ci.org/${pkg.shortGitHubPath})
+# simple-front-http-server [![Build Status](https://travis-ci.org/julien-f/simple-front-http-server.png?branch=master)](https://travis-ci.org/julien-f/simple-front-http-server)
 
 > ${pkg.description}
 
 ## Install
 
-Installation of the [npm package](https://npmjs.org/package/${pkg.name}):
+Installation of the [npm package](https://npmjs.org/package/simple-front-http-server):
 
 ```
-> npm install --save ${pkg.name}
+> npm install --save simple-front-http-server
 ```
 
 ## Usage
@@ -43,10 +43,10 @@ the code.
 
 You may:
 
-- report any [issue](${pkg.bugs})
+- report any [issue](https://github.com/julien-f/simple-front-http-server/issues)
   you've encountered;
 - fork and create a pull request.
 
 ## License
 
-${pkg.license} © [${pkg.author.name}](${pkg.author.url})
+${pkg.license} © [Julien Fontanet](julien.fontanet@isonoe.net)

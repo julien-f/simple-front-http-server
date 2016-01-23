@@ -1,0 +1,14 @@
+[Unit]
+Description=Simple Front HTTP Server
+Requires=simple-front-http-server.socket
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/simple-front-http-server
+Restart=always
+SyslogIdentifier=simple-front-http-server
+User=nobody
+
+[Install]
+WantedBy=multi-user.target
+Also=simple-front-http-server.socket

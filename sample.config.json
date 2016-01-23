@@ -1,13 +1,24 @@
 {
-  "user": "nobody",
-  "group": "nogroup",
+  // The user/group the process should use after starting to listen.
+  //
+  // It is usually better to let this be handled by the init system.
+  //"user": "nobody",
+  //"group": "nogroup",
 
+  // This entry list which ports/sockets/file descriptors the process
+  // should listen to.
+  //
+  // The current configuration makes the server listen on file
+  // descriptors 3 and 4 which are passed by systemd if you are using
+  // the provided socket and service units.
+  //
+  // For more information see https://github.com/julien-f/http-server-plus
   "listen": [
     {
-      "port": 80
+      "fd": 3
     },
     {
-      "port": 443,
+      "fd": 4,
       "certificate": "./certificate.pem",
       "key": "./key.pem"
     }

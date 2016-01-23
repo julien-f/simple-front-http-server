@@ -1,15 +1,15 @@
 {
   "private": true,
-  "name": "",
+  "name": "simple-front-http-server",
   "version": "0.0.0",
   "license": "ISC",
   "description": "",
   "keywords": [],
-  "homepage": "",
-  "bugs": "",
+  "homepage": "https://github.com/julien-f/simple-front-http-server",
+  "bugs": "https://github.com/julien-f/simple-front-http-server/issues",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/julien-f/simple-front-http-server"
   },
   "author": {
     "name": "Julien Fontanet",
@@ -17,7 +17,9 @@
   },
   "preferGlobal": false,
   "main": "dist/",
-  "bin": {},
+  "bin": {
+    "simple-front-http-server": "dist/cli"
+  },
   "files": [
     "dist/"
   ],
