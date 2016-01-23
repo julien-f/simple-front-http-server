@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import compress from 'koa-compress'
+import conditionalGet from 'koa-conditional-get'
 import createCallback from 'lodash/iteratee'
+import etag from 'koa-etag'
 import eventToPromise from 'event-to-promise'
 import execPromise from 'exec-promise'
 import find from 'lodash/find'
@@ -175,6 +177,10 @@ execPromise(async args => {
   // Help secure HTTP apps.
   // https://www.npmjs.com/package/helmet
   app.use(helmet())
+
+  app.use(conditionalGet())
+
+  app.use(etag())
 
   app.use(compress())
 
