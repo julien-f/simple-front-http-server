@@ -43,6 +43,14 @@ const ACTIONS = Object.freeze({
   proxy (conf) {
     const proxy = createProxyServer({
       target: conf
+    }).on('proxyRes', (proxyRes, req) => {
+      if (req.isSpdy) {
+        delete proxyRes.headers.connection
+        delete proxyRes.headers['keep-alive']
+        delete proxyRes.headers['proxy-connection']
+        delete proxyRes.headers['transfer-encoding']
+        delete proxyRes.headers.upgrade
+      }
     })
 
     const action = ctx => new Promise((resolve, reject) => {
