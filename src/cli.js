@@ -36,6 +36,8 @@ const ensureArray = value => value === undefined
     ? value
     : [ value ]
 
+const trueFn = () => true
+
 // ===================================================================
 
 const ACTIONS = Object.freeze({
@@ -103,7 +105,7 @@ const ACTIONS = Object.freeze({
 
 const normalizeRule = ({
   action,
-  ...properties
+  when
 }) => {
   let actionName, actionConf
   if (isArray(action)) {
@@ -116,7 +118,7 @@ const normalizeRule = ({
     action: ACTIONS[actionName](actionConf),
 
     // TODO: support prefix matching (necessary for static action).
-    match: createCallback(properties)
+    match: when ? createCallback(when) : trueFn
   }
 }
 
