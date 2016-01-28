@@ -5,6 +5,13 @@
   //"user": "nobody",
   //"group": "nogroup",
 
+  // Number of worker processes which are run.
+  //
+  // Set to false or 1 to disable.
+  //
+  // Default: the number of CPUs.
+  //"workers": 5,
+
   // This entry list which ports/sockets/file descriptors the process
   // should listen to.
   //
