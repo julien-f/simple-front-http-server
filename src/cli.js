@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import clusterMaster from 'cluster-master'
 import execPromise from 'exec-promise'
 import minimist from 'minimist'
 import { cpus as getCpus } from 'os'
 import { load as loadConfig } from 'app-conf'
 
+import createCluster from './cluster'
 import {
   name as pkgName,
   version as pkgVersion
@@ -31,23 +31,35 @@ execPromise(async args => {
     return help
   }
 
-  const config = await loadConfig('simple-front-http-server')
+  const cluster = createCluster(`${__dirname}/worker-wrapper.js`)
 
-  let { workers } = config
-  if (workers == null || workers === true) {
-    workers = getCpus().length
-  } else if (workers === false) {
-    workers = 1
-  }
-
-  clusterMaster({
-    exec: `${__dirname}/worker-wrapper.js`,
-    env: {
+  const init = () => loadConfig('simple-front-http-server').then(config => {
+    cluster.env = {
       SFHS_CONFIG: JSON.stringify(config)
-    },
-    size: workers
+    }
+
+    let { workers } = config
+    if (workers == null || workers === true) {
+      workers = getCpus().length
+    } else if (workers === false) {
+      workers = 1
+    }
+    cluster.workers = workers
+
+    return new Promise(resolve => cluster.sync(resolve, true))
+  })
+
+  await init().catch(::console.error)
+  process.on('SIGHUP', () => {
+    console.log('SIGHUP')
+    return init()
   })
 
   // Never stops.
-  return new Promise(() => {})
+  return new Promise(resolve => {
+    process.on('SIGINT', () => {
+      cluster.workers = 0
+      cluster.sync(resolve)
+    })
+  })
 })

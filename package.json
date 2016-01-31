@@ -26,7 +26,6 @@
   "dependencies": {
     "app-conf": "^0.4.0",
     "babel-runtime": "^6.3.19",
-    "cluster-master": "^0.2.1",
     "event-to-promise": "^0.6.0",
     "exec-promise": "^0.5.1",
     "http-proxy": "^1.12.0",
