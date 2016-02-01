@@ -1,7 +1,6 @@
 import cluster from 'cluster'
 import forOwn from 'lodash/forOwn'
 import noop from 'lodash/noop'
-import once from 'lodash/once'
 
 // ===================================================================
 
@@ -24,17 +23,29 @@ const makeCallbackGroup = (noopWrapper => cb => {
 // ===================================================================
 
 const startWorker = (env, cb) => {
-  cb = once(cb)
-  cluster.once('online', () => {
-    setTimeout(cb, 1e4)
-  })
-  cluster.once('listening', cb)
+  const worker = cluster.fork(env)
 
-  cluster.fork(env)
+  cb = (cb => () => {
+    debug(`worker ${worker.id} started`)
+
+    cb(worker)
+  })(cb)
+  worker.once('online', () => {
+    setTimeout(cb, 1e3)
+  })
 }
 
 const stopWorker = (worker, cb) => {
-  worker.once('exit', cb)
+  worker.once('exit', () => {
+    if (worker.suicide) {
+      debug(`worker ${worker.id} stopped`)
+    } else {
+      debug(`worker ${worker.id} exited abnormally`)
+    }
+
+    cb(worker)
+  })
+
   worker.process.connected && worker.disconnect()
 }
 
@@ -104,17 +115,10 @@ export default exec => {
   }
 
   cluster.on('fork', worker => {
-    debug(`worker ${worker.id} started`)
     ++nWorkers
 
     worker.on('exit', () => {
       --nWorkers
-
-      if (worker.suicide) {
-        debug(`worker ${worker.id} stopped`)
-      } else {
-        debug(`worker ${worker.id} exited abnormally`)
-      }
 
       master.sync()
     })
