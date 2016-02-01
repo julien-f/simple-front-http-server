@@ -73,7 +73,7 @@ export default exec => {
 
       const then = makeCallbackGroup(() => {
         busy = false
-        cb()
+        cb && cb()
       })
 
       let newWorkers = this.workers - nWorkers
