@@ -49,6 +49,15 @@
       }]
     },
 
+    // Display system info, SHOULD NOT be used in production.
+    {
+      "when": {
+        "path": "/info"
+      },
+
+      "action": "info"
+    },
+
     // Serve static files.
     {
       "when": {

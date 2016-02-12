@@ -31,6 +31,11 @@ const trueFn = () => true
 // ===================================================================
 
 const ACTIONS = Object.freeze({
+  // SHOULD NOT be used in production.
+  info: () => ctx => {
+    ctx.body = process.versions
+  },
+
   // TODO: support WebSocket.
   proxy (conf) {
     const proxy = createProxyServer({
