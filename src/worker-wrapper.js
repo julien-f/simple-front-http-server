@@ -1,4 +1,5 @@
 const config = JSON.parse(process.env.SFHS_CONFIG)
+delete process.env.SFHS_CONFIG
 
 // Drops privileges if requested.
 {
