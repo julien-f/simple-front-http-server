@@ -9,7 +9,7 @@ import createCluster from './cluster'
 import {
   name as pkgName,
   version as pkgVersion
-} from '../package'
+} from '../package.json'
 
 // ===================================================================
 
