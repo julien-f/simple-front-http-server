@@ -26,8 +26,15 @@
     },
     {
       "fd": 4,
-      "certificate": "./certificate.pem",
-      "key": "./key.pem"
+
+      // Certificate and key path can be specified directly.
+      //"cert": "./cert.pem",
+      //"key": "./key.pem",
+
+      // Or a template can be used to support selecting a certificate
+      // dependening on the host.
+      "certTpl": './ssl/:hostname/cert.pem',
+      "keyTpl": './ssl/:hostname/key.pem'
     }
   ],
 

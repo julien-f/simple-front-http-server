@@ -17,6 +17,7 @@ import { create as createHttpServer } from 'http-server-plus'
 import { createServer as createProxyServer } from 'http-proxy'
 import { format as formatUrl } from 'url'
 import { readFile } from 'fs-promise'
+import { asCallback, pAll } from 'promise-toolbox'
 
 // ===================================================================
 
@@ -119,10 +120,16 @@ const normalizeRule = ({
 
 // ===================================================================
 
+const HOSTNAME_RE = /:hostname\b/g
+
 export default async config => {
   // Starts listening.
   const server = createHttpServer()
-  await Promise.all(map(ensureArray(config.listen), async conf => {
+  await Promise.all(map(ensureArray(config.listen), async ({
+    certTpl,
+    keyTpl,
+    ...conf
+  }) => {
     const { cert, key } = conf
     if (cert && key) {
       [
@@ -132,6 +139,22 @@ export default async config => {
         readFile(cert),
         readFile(key)
       ])
+    }
+
+    if (certTpl || keyTpl) {
+      const cache = Object.create(null)
+      conf.SNICallback = (hostname, cb) => {
+        const cached = cache[hostname]
+        if (cache[hostname]) {
+          return cb(null, cached)
+        }
+
+        const hostnameFn = () => hostname
+        pAll.call({
+          cert: certTpl && readFile(certTpl.replace(HOSTNAME_RE, hostnameFn)),
+          key: keyTpl && readFile(keyTpl.replace(HOSTNAME_RE, hostnameFn))
+        })::asCallback(cb)
+      }
     }
 
     try {
