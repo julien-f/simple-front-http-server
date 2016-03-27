@@ -13,11 +13,12 @@ import map from 'lodash/map'
 import morgan from 'koa-morgan'
 import responseTime from 'koa-response-time'
 import serveStatic from 'koa-serve-static'
+import { all as pAll } from 'promise-toolbox'
 import { create as createHttpServer } from 'http-server-plus'
+import { createSecureContext } from 'tls'
 import { createServer as createProxyServer } from 'http-proxy'
 import { format as formatUrl } from 'url'
 import { readFile } from 'fs-promise'
-import { asCallback, pAll } from 'promise-toolbox'
 
 // ===================================================================
 
@@ -139,21 +140,49 @@ export default async config => {
         readFile(cert),
         readFile(key)
       ])
-    }
 
-    if (certTpl || keyTpl) {
-      const cache = Object.create(null)
-      conf.SNICallback = (hostname, cb) => {
-        const cached = cache[hostname]
-        if (cache[hostname]) {
-          return cb(null, cached)
+      if (certTpl && keyTpl) {
+        const cache = Object.create(null)
+        const inProgress = Object.create(null)
+
+        conf.SNICallback = (hostname, cb) => {
+          const cached = cache[hostname]
+          if (cache[hostname]) {
+            return cb(null, cached)
+          }
+
+          let queue = inProgress[hostname]
+          if (queue) {
+            return queue.push(cb)
+          }
+
+          queue = inProgress[hostname] = [ cb ]
+
+          const hostnameFn = () => hostname
+          pAll.call({
+            cert: readFile(certTpl.replace(HOSTNAME_RE, hostnameFn)),
+            key: readFile(keyTpl.replace(HOSTNAME_RE, hostnameFn))
+          }).then(
+            (context) => {
+              context = createSecureContext(context)
+
+              cache[hostname] = context
+
+              for (let i = 0, n = queue.length; i < n; ++i) {
+                queue[i](null, context)
+              }
+              delete inProgress[hostname]
+            },
+            (error) => {
+              // How to fallback? Return null?
+
+              for (let i = 0, n = queue.length; i < n; ++i) {
+                queue[i](error)
+              }
+              delete inProgress[hostname]
+            }
+          )
         }
-
-        const hostnameFn = () => hostname
-        pAll.call({
-          cert: certTpl && readFile(certTpl.replace(HOSTNAME_RE, hostnameFn)),
-          key: keyTpl && readFile(keyTpl.replace(HOSTNAME_RE, hostnameFn))
-        })::asCallback(cb)
       }
     }
 
