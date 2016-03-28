@@ -147,7 +147,7 @@ export default async config => {
 
         conf.SNICallback = (hostname, cb) => {
           const cached = cache[hostname]
-          if (cache[hostname]) {
+          if (cached !== undefined) {
             return cb(null, cached)
           }
 
@@ -157,6 +157,14 @@ export default async config => {
           }
 
           queue = inProgress[hostname] = [ cb ]
+          const dispatch = (context) => {
+            cache[hostname] = context
+
+            for (let i = 0, n = queue.length; i < n; ++i) {
+              queue[i](null, context)
+            }
+            delete inProgress[hostname]
+          }
 
           const hostnameFn = () => hostname
           pAll.call({
@@ -164,22 +172,13 @@ export default async config => {
             key: readFile(keyTpl.replace(HOSTNAME_RE, hostnameFn))
           }).then(
             (context) => {
-              context = createSecureContext(context)
-
-              cache[hostname] = context
-
-              for (let i = 0, n = queue.length; i < n; ++i) {
-                queue[i](null, context)
-              }
-              delete inProgress[hostname]
+              dispatch(createSecureContext(context))
             },
             (error) => {
-              // How to fallback? Return null?
+              console.error(error)
 
-              for (let i = 0, n = queue.length; i < n; ++i) {
-                queue[i](error)
-              }
-              delete inProgress[hostname]
+              // No context for this hostname.
+              dispatch(null)
             }
           )
         }
