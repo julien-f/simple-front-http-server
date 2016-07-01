@@ -17,7 +17,7 @@ const makeCallbackGroup = (noopWrapper => cb => {
       cb()
     }
   })(cb)
-  return () => (++count, cb)
+  return () => (++count, cb) // eslint-disable-line no-sequences
 })(() => noop)
 
 // ===================================================================
