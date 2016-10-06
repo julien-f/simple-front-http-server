@@ -16,7 +16,6 @@
     "email": "julien.fontanet@isonoe.net"
   },
   "preferGlobal": false,
-  "main": "dist/",
   "bin": {
     "simple-front-http-server": "dist/cli"
   },
@@ -58,7 +57,7 @@
   },
   "scripts": {
     "build": "NODE_ENV=production babel --source-maps --out-dir=dist/ src/",
-    "depcheck": "dependency-check ./package.json",
+    "depcheck": "dependency-check ./package.json --entry dist/worker-wrapper",
     "dev": "babel --watch --source-maps --out-dir=dist/ src/",
     "lint": "standard",
     "posttest": "npm run lint && npm run depcheck",
