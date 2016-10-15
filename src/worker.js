@@ -41,7 +41,8 @@ const ACTIONS = Object.freeze({
   // TODO: support WebSocket.
   proxy (conf) {
     const proxy = createProxyServer({
-      target: conf
+      target: conf,
+      xfwd: true
     }).on('proxyRes', (proxyRes, req) => {
       if (req.isSpdy) {
         delete proxyRes.headers.connection
