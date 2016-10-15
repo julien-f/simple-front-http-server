@@ -219,13 +219,19 @@ export default async config => {
 
   {
     const rules = map(ensureArray(config.rules), normalizeRule)
+    const n = rules.length
 
-    app.use((ctx, next) => {
-      const rule = find(rules, r => r.match(ctx))
-      return rule
-        ? rule.action(ctx)
-        : next()
-    })
+    const exec = (ctx, next, i) => {
+      while (i < n) {
+        const rule = rules[i++]
+        if (rule.match(ctx)) {
+          return rule.action(ctx, () => exec(ctx, next, i))
+        }
+      }
+
+      return next()
+    }
+    app.use((ctx, next) => exec(ctx, next, 0))
 
     server.on('upgrade', (req, socket, head) => {
       const ctx = Object.defineProperties(app.createContext(req), {
