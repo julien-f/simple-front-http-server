@@ -12,6 +12,7 @@ import koaConvert from 'koa-convert'
 import map from 'lodash/map'
 import morgan from 'koa-morgan'
 import responseTime from 'koa-response-time'
+import serveIndex from 'koa-serve-index'
 import serveStatic from 'koa-serve-static'
 import { all as pAll } from 'promise-toolbox'
 import { create as createHttpServer } from 'http-server-plus'
@@ -33,6 +34,8 @@ const trueFn = () => true
 // ===================================================================
 
 const ACTIONS = Object.freeze({
+  index: serveIndex,
+
   // SHOULD NOT be used in production.
   info: () => ctx => {
     ctx.body = process.versions
@@ -107,13 +110,13 @@ const normalizeRule = ({
 }) => {
   let actionName, actionConf
   if (isArray(action)) {
-    [ actionName, actionConf ] = action
+    [ actionName, ...actionConf ] = action
   } else {
     actionName = action
   }
 
   return {
-    action: ACTIONS[actionName](actionConf),
+    action: koaConvert(ACTIONS[actionName](...actionConf)),
 
     // TODO: support prefix matching (necessary for static action).
     match: when ? createCallback(when) : trueFn
