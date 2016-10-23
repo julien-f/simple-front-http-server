@@ -113,6 +113,7 @@ const normalizeRule = ({
     [ actionName, ...actionConf ] = action
   } else {
     actionName = action
+    actionConf = []
   }
 
   return {
