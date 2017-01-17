@@ -56,11 +56,12 @@
     "babel-preset-latest": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "dependency-check": "^2.5.1",
-    "ghooks": "^1.2.4",
+    "husky": "^0.12.0",
     "standard": "^8.1.0"
   },
   "scripts": {
     "build": "NODE_ENV=production babel --source-maps --out-dir=dist/ src/",
+    "commitmsg": "npm test",
     "depcheck": "dependency-check ./package.json --entry dist/worker-wrapper",
     "dev": "NODE_ENV=development babel --watch --source-maps --out-dir=dist/ src/",
     "lint": "standard",
@@ -88,10 +89,5 @@
       "dist"
     ],
     "parser": "babel-eslint"
-  },
-  "config": {
-    "ghooks": {
-      "commit-msg": "npm test"
-    }
   }
 }
