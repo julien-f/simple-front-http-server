@@ -33,8 +33,8 @@
 
       // Optionally, template entries can be used to support selecting
       // a certificate depending on the host.
-      "certTpl": './ssl/:hostname/cert.pem',
-      "keyTpl": './ssl/:hostname/key.pem'
+      "certTpl": "./ssl/:hostname/cert.pem",
+      "keyTpl": "./ssl/:hostname/key.pem"
     }
   ],
 
