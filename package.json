@@ -26,14 +26,14 @@
     "node": ">=4"
   },
   "dependencies": {
-    "app-conf": "^0.4.0",
-    "babel-runtime": "^6.11.6",
+    "app-conf": "^0.4.1",
+    "babel-runtime": "^6.23.0",
     "event-to-promise": "^0.8.0",
     "exec-promise": "^0.6.1",
     "fs-promise": "^2.0.0",
-    "http-proxy": "^1.14.0",
+    "http-proxy": "^1.16.2",
     "http-server-plus": "^0.8.0",
-    "koa": "^2.0.0",
+    "koa": "^2.0.1",
     "koa-compress": "^2.0.0",
     "koa-conditional-get": "^2.0.0",
     "koa-convert": "^1.2.0",
@@ -43,21 +43,21 @@
     "koa-response-time": "^2.0.0",
     "koa-serve-index": "^1.1.1",
     "koa-serve-static": "^1.0.0",
-    "lodash": "^4.13.1",
+    "lodash": "^4.17.4",
     "minimist": "^1.2.0",
     "promise-toolbox": "^0.8.0",
-    "spdy": "^3.3.3"
+    "spdy": "^3.4.4"
   },
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "babel-eslint": "^7.0.0",
-    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-cli": "^6.23.0",
+    "babel-eslint": "^7.1.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-babili": "0.0.11",
-    "babel-preset-latest": "^6.16.0",
-    "babel-preset-stage-0": "^6.16.0",
-    "dependency-check": "^2.5.1",
-    "husky": "^0.12.0",
-    "standard": "^8.1.0"
+    "babel-preset-latest": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "dependency-check": "^2.8.0",
+    "husky": "^0.13.1",
+    "standard": "^9.0.0"
   },
   "scripts": {
     "build": "NODE_ENV=production babel --source-maps --out-dir=dist/ src/",
